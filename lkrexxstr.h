@@ -8,7 +8,7 @@
 /*                                                                          */
 /* Примечания:                                                              */
 /* 1) для функций, возвращающих текстовую стороку, в качестве первого аргу- */
-/* мента добавлен указатель на буфер. /* Далее следуют аргументы в обычном  */
+/* мента добавлен указатель на буфер.    Далее следуют аргументы в обычном  */
 /* порядке REXX.                                                            */
 /* 2) все функции самомодифицирующиеся: некоторые переменные хранятся в     */
 /* коде команд.                                                             */
@@ -29,23 +29,29 @@
 /* 3) SPACE-function temporarily modifies the original string, trimming     */
 /* trailing spaces. It's wrong, I know. :(                                  */
 /****************************************************************************/
-void CHANGESTR(char* dest, char* needle, char* haystack, char* newneedle);
-int  COMPARE(char* s1, char* s2, char pad);
-void COMPRESS(char* d, char* s, char* list);
-void COPIES(char* d, char* s, unsigned char num);
-int  COUNTSTR(char* needle, char* haystack);
-void DELSTR(char* d, char* s, int start, int lenght);
-void LEFT(char* d, char* s, unsigned char lenght, char pad);
-int  LENGHT(char* string);
-void REVERSE(char* d, char* s);
-void SPACE(char* d, char* s, unsigned char len, char pad);
-void TRIM(char* d, char* s);
-void UPPER(char* d, char* s);
-int  WORDINDEX(char* string, int WordNum);
-int  WORDS(char* string);
-void WORD(char* dst, char* string, int WordNum);
-int  WORDLENGHT(char* string, int WordNum);
-int  WORDPOS(char* phrase, char* string, int startpos);
+
+void CHANGESTR(char* dest, char* needle, char* haystack, char* newneedle) __naked;
+int  COMPARE(char* s1, char* s2, char pad) __naked;
+void COMPRESS(char* d, char* s, char* list) __naked;
+void COPIES(char* d, char* s, unsigned char num) __naked;
+int  COUNTSTR(char* needle, char* haystack) __naked;
+void DELSTR(char* d, char* s, int start, int lenght) __naked;
+void LEFT(char* d, char* s, unsigned char lenght, char pad) __naked;
+void RIGHT(char* d, char* s, unsigned char lenght, char pad) __naked;
+void CENTER(char* dest, char* string, unsigned char len, char pad) __naked;
+#define CENTRE CENTER
+int  LENGTH(char* string) __naked;
+void REVERSE(char* d, char* s) __naked;
+void SPACE(char* d, char* s, unsigned char len, char pad) __naked;
+void TRIM(char* d, char* s) __naked;
+void UPPER(char* d, char* s) __naked;
+void LOWER(char* d, char* s) __naked;
+int  WORDINDEX(char* string, int WordNum) __naked;
+int  WORDS(char* string) __naked;
+void WORD(char* dst, char* string, int WordNum) __naked;
+int  WORDLENGHT(char* string, int WordNum) __naked;
+int  WORDPOS(char* phrase, char* string, int startpos) __naked;
+void STRIP(char* dest, char* string, char option, char pad) __naked;
 
 /****************/
 /* TODO:	*/
@@ -54,12 +60,8 @@ int  WORDPOS(char* phrase, char* string, int startpos);
 /* SUBSTR       */
 /* SUBWORD      */
 /* TRANSLATE    */
-/* CENTER       */
-/* CENTRE       */
+/* FIND         */
 /* JUSTIFY      */
 /* LASTPOS      */
-/* LOWER        */
 /* POS          */
-/* RIGHT        */
-/* STRIP        */
 /****************/
