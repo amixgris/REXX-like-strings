@@ -52,6 +52,7 @@ void WORD(char* dst, char* string, int WordNum) __naked;
 int  WORDLENGHT(char* string, int WordNum) __naked;
 int  WORDPOS(char* phrase, char* string, int startpos) __naked;
 void STRIP(char* dest, char* string, char option, char pad) __naked;
+int FIND(char* string, char* phrase) __naked;
 
 /****************/
 /* TODO:	*/
