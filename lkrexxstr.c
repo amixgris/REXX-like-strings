@@ -1099,12 +1099,103 @@ __asm
     ld  (de),a
     ret
 
-5$: ; dec c
-    ex  af,af
+5$: ex  af,af
     call 6$
     inc de
     xor a,a
     ld  (de),a
+    ret
+__endasm;
+}
+
+/*--------------------------------- Cut here ---------------------------------*/
+
+int FIND(char* string, char* phrase)
+{ string; phrase;
+__asm
+    POP     AF  ; ret
+    pop     de  ; string
+    POP     HL  ; phrase
+    push    hl
+    push    de
+    push    af
+
+    ld  bc,#0
+    push de
+5$: push hl
+2$: ld  a,(hl)
+    or  a,a
+    jr  z,100$  ; exit, phrase is found.
+    cp  a,#' '
+    jr  nz,1$
+    inc hl
+    jr  2$
+
+1$: ld  a,(de)
+    or  a,a
+    jr  z,99$   ; exit, phrase not found.
+    cp  a,#' '
+    jr  nz,3$
+    inc de
+    jr  1$
+3$: inc de
+    cp  a,(hl)
+    jr  z,4$
+    pop hl      ; restore ptr to phrase.
+    ld  b,d
+    ld  c,e
+    jr  5$
+4$: inc hl
+    jr  2$
+
+99$:
+    pop hl
+    pop de
+    ld  hl,#0
+    ret
+100$:
+    inc bc
+    pop de
+    pop de
+    ld  h,b
+    ld  l,c
+    or  a,a
+    sbc hl,de
+    ex  de,hl
+    ld  bc,#0   ; word counter
+
+9$: ld  a,d
+    or  a,e
+    jr  z,7$
+    dec de
+
+    ld  a,(hl)
+    cp  a,#' '
+    jr  nz,8$
+    inc hl
+    jr  9$
+
+8$: inc bc  ; this is word!
+11$:
+    ld  a,(hl)
+    cp  a,#' '
+    jr  nz,10$
+    inc hl
+    jr  9$
+10$:
+    inc hl
+
+    ld  a,d
+    or  a,e
+    jr  z,7$
+    dec de
+    inc hl
+    jr  11$
+
+
+7$: ; correct from 0
+    ld  h,b
+    ld  l,c
     ret
 __endasm;
 }
