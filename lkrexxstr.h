@@ -61,7 +61,6 @@ int FIND(char* string, char* phrase) __naked;
 /* SUBSTR       */
 /* SUBWORD      */
 /* TRANSLATE    */
-/* FIND         */
 /* JUSTIFY      */
 /* LASTPOS      */
 /* POS          */
