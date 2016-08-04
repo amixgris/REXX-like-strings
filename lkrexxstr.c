@@ -1,8 +1,100 @@
 
+void STRIP(char* dest, char* string, char option, char pad) __naked
+{dest, string, option, pad;
+__asm
+    POP     AF
+    POP     HL	; dest
+    POP     DE	; string
+    POP     BC	; option/pad
+	push	bc
+	push	de
+	push	hl
+	push	af
+	ld  a,c
+	ld  c,b
+	ld  b,a
+
+	ld	a,c
+	cp	a,#' '
+	jr	nc,100$
+	ld	c,#' '	; pad = default
+100$:	ld	a,b
+	cp	a,#'B'
+	jr	nc,101$
+	ld	b,#'B'
+101$:	ld	a,b
+	cp	a,#'L'
+	jr	z,103$
+	cp	a,#'l'
+	jr	z,103$
+	cp	a,#'B'
+	jr	z,103$
+	cp	a,#'b'
+	jr	z,103$
+	cp	a,#'T'
+	jr	z,105$
+	cp	a,#'t'
+	jr	z,105$
+
+103$:
+    ld	a,(de)	;skip leading chars
+	or	a,a
+	jp	z,1$
+	cp	a,c	; compare with pad-char.
+	jr	nz,104$
+	inc	de
+	jr	103$
+104$:	ld 	a,b
+	cp	a,#'B'
+	jr	z,105$
+	cp	a,#'b'
+	jr	z,105$
+
+2$: ld	a,(de)	;skip leading chars
+	or	a,a
+	jr	z,1$
+	ld	(hl),a
+	inc	hl
+	inc	de
+	jr	2$
+
+105$:	push	hl	;dest
+	push	de	;string
+	push	bc
+
+	ld	h,d
+	ld	l,e
+	ld	bc,#256
+	xor	a,a
+	cpir
+	dec	hl
+	dec hl
+
+	pop	bc
+
+3$:	ld	a,(hl)	;skip trailing chars
+	cp	a,c	; compare with pad-char.
+	jr	nz,4$
+	dec	hl
+	jr	3$
+4$:	inc	hl
+	or	a,a
+	sbc	hl,de
+	ld	b,h
+	ld	c,l
+	pop	hl	; change ptrs for ldir
+	pop 	de
+	ldir
+	ex de,hl
+
+1$:     ld	(hl),#0
+	RET
+__endasm;
+}
 void CHANGESTR(char* dest, char* needle, char* haystack, char* newneedle) __naked
 { dest,needle,haystack, newneedle;
 __asm
- 
+
         LD      (1$+1),SP
         POP     AF
         POP     HL
@@ -175,7 +267,7 @@ __endasm;
 void COPIES(char* d, char* s, unsigned char num) __naked
 {d, s, num;
 __asm
-         
+
         POP     AF
         POP     DE
         POP     HL
@@ -190,7 +282,7 @@ __asm
         XOR     A,A
         LD      B,A
         LD      C,A
-        CPIR 
+        CPIR
         XOR     A,A
         SUB     C
         DEC     A
@@ -202,7 +294,7 @@ __asm
         PUSH    HL
         LD      C,B
         LD      B,#0
-        LDIR 
+        LDIR
         POP     HL
         POP     BC
         DEC     C
@@ -210,7 +302,7 @@ __asm
 
         XOR     A,A
         LD      (DE),A
-        RET 
+        RET
 __endasm;
 }
 
@@ -312,7 +404,7 @@ __asm
         PUSH    DE
         PUSH    HL
         PUSH    AF
- 
+
         LD      A,B
         OR      A
         JR      NZ,1$
@@ -337,7 +429,71 @@ __endasm;
 
 /*--------------------------------- Cut here ---------------------------------*/
 
-int LENGHT(char* string) __naked
+void RIGHT(char* d, char* s, unsigned char lenght, char pad) __naked
+{d, s, lenght, pad;
+__asm
+    LD      (1$+1),SP
+    POP     AF
+
+    POP     HL      ; d
+    POP     DE      ; s
+    pop     bc  ; c = len,  b = pad
+
+    ld  a,b
+    cp  a,#' '
+    jr  nc,2$
+    ld  a,#' '  ; if pad char < 0x20, then pad char = 0x20.
+2$: ex  af,af
+    ld  b,#0
+    ADD  HL,BC
+    INC C
+    PUSH HL ; end of dest
+
+    LD  B,C
+
+    LD  H,D
+    LD  L,E
+
+    PUSH BC
+    LD  B,#1
+    CPIR
+    POP BC
+
+    OR  A,A
+
+    PUSH HL
+    SBC HL,DE
+    LD  A,L
+    POP DE
+    DEC DE
+
+    POP HL
+    LD  C,A
+
+
+7$: LD  A,(DE)
+    LD  (HL),A
+    DEC HL
+    DEC DE
+    DEC C
+    JR  Z,3$
+    DJNZ 7$
+    JR  1$
+3$: EX  AF,AF
+5$: DJNZ    4$
+1$: LD      SP,#0
+    RET
+4$: LD  (HL),A
+    DEC HL
+    JR  5$
+__endasm;
+}
+
+
+
+/*--------------------------------- Cut here ---------------------------------*/
+
+int LENGTH(char* string) __naked
 { string;
 __asm
         POP     AF
@@ -366,7 +522,7 @@ __asm
         POP     HL      ; s
         LD      BC,#0
         XOR     A
-        CPIR 
+        CPIR
         XOR     A
         SUB     C
         LD      C,A
@@ -388,7 +544,7 @@ __asm
         JP      NZ,3$
         LD      (DE),A
 1$:     LD      SP,#0
-        RET 
+        RET
 __endasm;
 }
 
@@ -480,7 +636,7 @@ __asm
         XOR     A,A
         LD      B,A
         LD      C,A
-        CPIR 
+        CPIR
         PUSH    HL
         LD      H,A
         LD      L,A
@@ -496,7 +652,7 @@ __asm
         JR      NZ,2$
         JP      1$
 2$:     POP     HL
-        LDIR 
+        LDIR
         EX      DE,HL
         LD      (HL),#0
         RET
@@ -533,6 +689,57 @@ __asm
         INC     HL
         INC     DE
         JR      5$
+1$:     LD      (DE),A
+        RET
+__endasm;
+}
+
+/*--------------------------------- Cut here ---------------------------------*/
+
+void LOWER(char* d, char* s) __naked
+{ s,d;
+__asm
+    POP     AF
+    POP     DE
+    EX      (SP),HL
+    PUSH    DE
+    PUSH    AF
+ 5$:
+    LD      A,(HL)
+	ld      c,a
+	OR      A,A
+    JR      Z,1$
+
+	cp	a,#0xa8
+	jr	nz,3$
+	add	a,#0x10
+	jr	100$
+
+3$:	CP  a,#65
+	jr	c,100$
+	ld	a,#90
+	cp	a,c
+	jr	c,4$
+	ld	a,c
+	add	a,#0x20
+	jr	100$
+
+4$:	ld	a,c
+	cp	#0xc0
+	jr	c,100$
+	ld	a,#0xdf
+	cp	a,c
+	jr	c,99$
+	ld	a,c
+	add	a,#0x20
+	jr	100$
+99$: ld  a,c
+100$:
+
+    ld	(de),a
+	inc	de
+	inc	hl
+	jr	5$
 1$:     LD      (DE),A
         RET
 __endasm;
@@ -609,7 +816,7 @@ __asm
         PUSH    HL
         PUSH    DE
         PUSH    AF
-        
+
         LD      B,C
         LD      C,#0 ; word counter
         LD      A,(HL)
@@ -635,7 +842,7 @@ __asm
         JR      Z,2$
         JR      4$
 1$:     LD      HL,#0
-        RET 
+        RET
 5$:     PUSH    DE
 6$:     LD      A,(DE)
         OR      A,A
@@ -668,11 +875,11 @@ __asm
         DEC     HL
         INC     C
         JR      5$
-        RET 
+        RET
 7$:     POP     DE
         LD      H,#0
         LD      L,C
-        RET 
+        RET
 __endasm;
 }
 
@@ -765,9 +972,9 @@ __asm
         JR      Z,2$
         JR      3$
 1$:     LD      DE,#0
-        RET 
+        RET
 5$:     EX      DE,HL
-        RET 
+        RET
 __endasm;
 }
 
@@ -803,6 +1010,101 @@ __asm
         JR      4$
 1$:     LD      L,C
         LD      H,B
-        RET 
+        RET
+__endasm;
+}
+
+/*--------------------------------- Cut here ---------------------------------*/
+
+void CENTER(char* dest, char* string, unsigned char len, char pad)
+{ dest, string; len; pad;
+__asm
+    POP     AF  ; ret
+    pop     de  ; dest
+    POP     HL  ; string
+    POP     BC  ; B = pad, C = len;
+    push    bc
+    push    hl
+    push    de
+    push    af
+
+    ld  a,b
+    cp  a,#' '
+    jr  nc,2$
+    ld  a,#' '  ; if pad char < 0x20, then pad char = 0x20.
+2$: ex  af,af
+
+    push bc
+    ld  b,#1
+    push de
+    push hl
+    ld  d,h
+    ld  e,l
+    xor a,a
+    cpir
+    dec hl
+    or  a,a
+    sbc hl,de
+    ld  a,l
+    pop hl
+    pop de
+    pop bc
+    ld  b,c
+    ld  c,a ; len of string
+    cp  a,b
+
+    jr  c,3$ ; string is shorter
+    jr  z,4$ ; string is equal. Simple copy.
+;   len is shorter then string
+    sub a,b
+    srl a
+    add a,l
+    ld  l,a
+    jr  nc,4$
+    inc h
+
+4$: ld  c,b
+
+
+    xor a,a
+6$: ld  b,#0
+    ldir
+    ld  (de),a
+    ret
+
+3$: ld  a,b
+    sub c
+    ld  b,a
+    srl a
+    jr  z,5$
+    push bc
+    ld  b,a
+    ex  af,af
+7$: ld  (de),a
+    inc de
+    djnz 7$
+    ex  af,af
+    pop bc
+
+    sub b
+    neg
+    ld  b,#0
+    ldir
+    ld  b,a
+    ex  af,af
+8$: ld  (de),a
+    inc  de
+    djnz    8$
+    xor a,a
+    ld  (de),a
+    ret
+
+5$: ; dec c
+    ex  af,af
+    call 6$
+    inc de
+    xor a,a
+    ld  (de),a
+    ret
 __endasm;
 }
