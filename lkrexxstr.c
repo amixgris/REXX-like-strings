@@ -1199,3 +1199,69 @@ __asm
     ret
 __endasm;
 }
+
+/*--------------------------------- Cut here ---------------------------------*/
+
+void SUBSTR(char* dest, char* string, unsigned char start, unsigned char len, unsigned char padchar)
+{ dest, string, start, len, padchar;
+__asm
+    push ix
+    ld  ix,#0
+    add ix,sp
+
+    ld  a,10(ix)
+    cp  a,#' '
+    jr  nc,1$
+    ld  10(ix),#' '
+1$: ld  l,6(ix)
+    ld  h,7(ix)
+    ld  b,#1
+    xor a,a
+    push hl
+    cpir
+    dec hl
+    ex  de,hl
+    pop hl
+    ld  c,8(ix)
+    dec c   ; correct of start
+    ld  b,a
+    add hl,bc
+
+    ex  de,hl
+    push hl
+    or  a,a
+    sbc hl,de
+    push af
+
+    ld  a,9(ix)
+    or  a,a
+    jr  nz,9$
+    ld  10(ix),l
+
+9$: pop af
+    pop hl
+    ex  de,hl
+    ld  b,9(ix) ; len
+    ld  d,5(ix)
+    ld  e,4(ix)
+    jr  c,2$
+3$: ld  a,(hl)
+    or  a,a
+    jr  z,2$
+    ld  (de),a
+    inc de
+    inc hl
+    djnz 3$
+    jr  5$
+2$: ld  a,10(ix)
+4$: ld  (de),a
+    inc de
+    djnz 4$
+
+5$: xor a,a
+    ld  (de),a
+    pop ix
+    ret
+__endasm;
+}
+
