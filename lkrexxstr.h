@@ -29,7 +29,6 @@
 /* 3) SPACE-function temporarily modifies the original string, trimming     */
 /* trailing spaces. It's wrong, I know. :(                                  */
 /****************************************************************************/
-
 void CHANGESTR(char* dest, char* needle, char* haystack, char* newneedle) __naked;
 int  COMPARE(char* s1, char* s2, char pad) __naked;
 void COMPRESS(char* d, char* s, char* list) __naked;
@@ -52,13 +51,14 @@ void WORD(char* dst, char* string, int WordNum) __naked;
 int  WORDLENGHT(char* string, int WordNum) __naked;
 int  WORDPOS(char* phrase, char* string, int startpos) __naked;
 void STRIP(char* dest, char* string, char option, char pad) __naked;
-int FIND(char* string, char* phrase) __naked;
+int  FIND(char* string, char* phrase) __naked;
+void SUBSTR(char* dest, char* string, unsigned char start, unsigned char len, unsigned char padchar) __naked;
+
 
 /****************/
 /* TODO:	*/
 /* INSERT       */
 /* DELWORD      */
-/* SUBSTR       */
 /* SUBWORD      */
 /* TRANSLATE    */
 /* JUSTIFY      */
