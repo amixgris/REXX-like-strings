@@ -1265,3 +1265,79 @@ __asm
 __endasm;
 }
 
+/*--------------------------------- Cut here ---------------------------------*/
+
+void SUBWORD(char* dest, char* string, unsigned char start, unsigned char len)
+{ dest, string, start, len;
+__asm
+    pop af
+    pop de  ; dest
+    pop hl  ; string
+    pop bc  ; len/start
+    push bc
+    push hl
+    push de
+    push af
+
+    dec c   ; correct word number
+
+; words skiping:
+2$: ld  a,(hl)
+    inc hl
+    or  a,a
+    jr  z,1$    ; go to exit
+    cp  a,#' '
+    jr  z,2$
+
+    dec hl
+
+3$: ld  a,(hl)
+    inc hl
+    or  a,a
+    jr  z,1$    ; go to exit
+    cp  a,#' '
+    jr  nz,3$   ; word is continued
+    dec c
+    jr  nz,2$   ; go to detect next word
+
+4$: cp  a,#' '
+    jr  nz,11$
+    inc hl
+    ld  a,(hl)
+    jr  4$
+11$:
+    dec hl
+; words coping:
+12$: ld  a,(hl)
+    inc hl
+    or  a,a
+    jr  z,1$    ; go to exit
+    ld  (de),a
+    inc de
+    cp  a,#' '
+    jr  z,12$
+    dec hl
+    dec de
+13$:
+    ld  a,(hl)
+    inc hl
+    or  a,a
+    jr  z,1$    ; go to exit
+    ld  (de),a
+    inc de
+    cp  a,#' '
+    jr  nz,13$   ; word is continued
+    djnz 12$   ; go to detect next word
+
+1$: ex  de,hl
+    ld  a,#' '
+9$: dec  hl     ; skip trailing spaces after last word
+    cp   a,(hl)
+    jr  z,9$
+    inc hl
+    ld  (hl),#0
+    ret
+
+__endasm;
+}
+
