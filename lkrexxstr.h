@@ -3,7 +3,7 @@
 /*                                                                          */
 /* Эта библиотека содержит реализацию некоторых функций языка REXX для ис-  */
 /* пользования с проектом SDCC. Все функции написаны, исключительно, на ас- */
-/* семблере Z80. Подробное описаниее функций можно найти в соответствующей  */
+/* семблере Z80. Подробное описание функций можно найти в соответствующей   */
 /* документации для REXX/ARexx.                                             */
 /*                                                                          */
 /* Примечания:                                                              */
@@ -53,13 +53,13 @@ int  WORDPOS(char* phrase, char* string, int startpos) __naked;
 void STRIP(char* dest, char* string, char option, char pad) __naked;
 int  FIND(char* string, char* phrase) __naked;
 void SUBSTR(char* dest, char* string, unsigned char start, unsigned char len, unsigned char padchar) __naked;
+void SUBWORD(char* dest, char* string, unsigned char start, unsigned char len) __naked;
 
 
 /****************/
-/* TODO:	*/
+/* TODO:      	*/
 /* INSERT       */
 /* DELWORD      */
-/* SUBWORD      */
 /* TRANSLATE    */
 /* JUSTIFY      */
 /* LASTPOS      */
